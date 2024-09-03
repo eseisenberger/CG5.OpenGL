@@ -31,8 +31,9 @@ public class Cylinder : IModel
         
         var vertexBuffer = new VertexBuffer(sideVertices, sideVertices.Length * Marshal.SizeOf<Vertex>(),
             sideVertices.Length, BufferUsageHint.StaticDraw,
-            new VertexBuffer.Attribute(0, 3) /*positions*/,
-            new VertexBuffer.Attribute(1, 2) /*texture coordinates*/);
+            new VertexBuffer.Attribute(0, 3) /* positions */,
+            new VertexBuffer.Attribute(1, 2) /* texture coordinates */,
+            new VertexBuffer.Attribute(2, 3) /* normal */);
         
         SideMesh = new Mesh(PrimitiveType.Triangles, indexBuffer, vertexBuffer);
         
@@ -55,15 +56,18 @@ public class Cylinder : IModel
     {
         var topVertices = GenerateBaseVertices(
             radius: radius, 
-            height: height / 2, 
+            height: -height / 2, 
             count: vertexCount, 
             texCenter: new Vector2(0.25f, 0.75f)
         );
 
+        topVertices = topVertices.Select(x => x with { Normal = new Vector3(0,-1,0) }).ToArray();
+        
         var topVertexBuffer = new VertexBuffer(topVertices, topVertices.Length * Marshal.SizeOf<Vertex>(),
             topVertices.Length, BufferUsageHint.StaticDraw,
-            new VertexBuffer.Attribute(0, 3) /*positions*/,
-            new VertexBuffer.Attribute(1, 2) /*texture coordinates*/);
+            new VertexBuffer.Attribute(0, 3) /* positions */,
+            new VertexBuffer.Attribute(1, 2) /* texture coordinates */,
+            new VertexBuffer.Attribute(2, 3) /* normals */);
         
         var topIndices = GenerateBaseIndices(vertexCount);
         
@@ -77,15 +81,18 @@ public class Cylinder : IModel
     {
         var bottomVertices = GenerateBaseVertices(
             radius: radius, 
-            height: -height / 2, 
+            height: height / 2, 
             count: vertexCount,
             texCenter: new Vector2(0.75f, 0.75f)
         );
 
+        bottomVertices = bottomVertices.Select(x => x with { Normal = new Vector3(0,1,0) }).ToArray();
+        
         var bottomVertexBuffer = new VertexBuffer(bottomVertices, bottomVertices.Length * Marshal.SizeOf<Vertex>(),
             bottomVertices.Length, BufferUsageHint.StaticDraw,
-            new VertexBuffer.Attribute(0, 3) /*positions*/,
-            new VertexBuffer.Attribute(1, 2) /*texture coordinates*/);
+            new VertexBuffer.Attribute(0, 3) /* positions */,
+            new VertexBuffer.Attribute(1, 2) /* texture coordinates */,
+            new VertexBuffer.Attribute(2, 3) /* normals */);
         
         var bottomIndices = GenerateBaseIndices(vertexCount);
         
@@ -148,8 +155,8 @@ public class Cylinder : IModel
             var position = Utilities.CylindricalToCartesian(currentCylindricalPosition);
             var uv = new Vector2((float)i / count, 0.5f);
 
-            vertices[i * 2] = new Vertex(position, uv);
-            vertices[i * 2 + 1] = new Vertex(position with { Y = height / 2 }, uv with { Y = 0.0f });
+            vertices[i * 2] = new Vertex(position, uv, position);
+            vertices[i * 2 + 1] = new Vertex(position with { Y = height / 2 }, uv with { Y = 0.0f }, position);
             
             currentCylindricalPosition.Z += rotationChange;
         }

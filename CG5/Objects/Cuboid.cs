@@ -38,8 +38,8 @@ public class Cuboid : IModel
         var leftBottomBack = new Vector3(-halfWidth, halfHeight, -halfDepth);
         var rightBottomBack = new Vector3(halfWidth, halfHeight, -halfDepth);
 
-        var topNormal = new Vector3(0, 1, 0);     
-        var bottomNormal = topNormal; 
+        var topNormal = new Vector3(0, -1, 0);     
+        var bottomNormal = new Vector3(0, 1, 0); 
         var frontNormal = new Vector3(0, 0, 1);   
         var backNormal = new Vector3(0, 0, -1);   
         var leftNormal = new Vector3(-1, 0, 0);   

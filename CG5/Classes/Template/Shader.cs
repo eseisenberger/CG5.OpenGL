@@ -14,7 +14,7 @@ namespace CG5.OpenGL.Classes.Template;
 
 public class Shader : IDisposable
 {
-    public const string ResourcesPath = "CG5.OpenGl.Resources";
+    public const string ResourcesPath = "CG5.Resources";
     public int Handle { get; private set; }
     private Dictionary<string, int> Uniforms { get; } = new();
 
@@ -47,7 +47,8 @@ public class Shader : IDisposable
     private string ReadSource(string path)
     {
         var assembly = Assembly.GetExecutingAssembly();
-        using var stream = assembly.GetManifestResourceStream($"{ResourcesPath}.{path}");
+        var assemblyName = assembly.GetName().Name;
+        using var stream = assembly.GetManifestResourceStream($"{assemblyName}.Resources.{path}");
         if (stream == null) throw new Exception("Shader not found!");
         using var reader = new StreamReader(stream, Encoding.UTF8);
         return reader.ReadToEnd();

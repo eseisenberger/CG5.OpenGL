@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CG5.OpenGl", "CG5.OpenGl\CG5.OpenGl.csproj", "{AEF14473-1CB3-44F0-B877-A92A7321D973}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CG5", "CG5\CG5.csproj", "{AEF14473-1CB3-44F0-B877-A92A7321D973}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

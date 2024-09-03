@@ -17,7 +17,7 @@ namespace CG5.OpenGL.Classes.Template;
 
 public class Texture : IDisposable, IBindable
 {
-    public const string ResourcesPath = "CG5.OpenGl.Resources";
+    public const string ResourcesPath = "CG5.Resources";
     public int Handle { get; }
 
     public Texture()
