@@ -9,7 +9,7 @@ using MaterialFace = OpenTK.Graphics.OpenGL4.MaterialFace;
 using TextureTarget = OpenTK.Graphics.OpenGL4.TextureTarget;
 using TextureUnit = OpenTK.Graphics.OpenGL4.TextureUnit;
 
-namespace CG5.OpenGL.Classes.Template;
+namespace CG5.Classes.Template;
 
 public class State : IDisposable
 {

@@ -22,7 +22,7 @@ using TextureTarget = OpenTK.Graphics.OpenGL4.TextureTarget;
 using TextureUnit = OpenTK.Graphics.OpenGL4.TextureUnit;
 using VertexAttribType = OpenTK.Graphics.OpenGL4.VertexAttribType;
 
-namespace CG5.OpenGL.Classes.Template;
+namespace CG5.Classes.Template;
 
 public unsafe class ImGuiController : IDisposable
 {

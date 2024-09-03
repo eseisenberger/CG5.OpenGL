@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
-using CG5.OpenGL.Classes.Template;
-using CG5.OpenGL.Interfaces;
+using CG5.Classes.Template;
+using CG5.Interfaces;
 using OpenTK.Mathematics;
 using BufferUsageHint = OpenTK.Graphics.OpenGL4.BufferUsageHint;
 using DrawElementsType = OpenTK.Graphics.OpenGL4.DrawElementsType;
@@ -8,7 +8,7 @@ using PrimitiveType = OpenTK.Graphics.OpenGL4.PrimitiveType;
 using Vector2 = OpenTK.Mathematics.Vector2;
 using Vector3 = OpenTK.Mathematics.Vector3;
 
-namespace CG5.OpenGL.Objects;
+namespace CG5.Objects;
 
 public class Cuboid : IModel
 {
@@ -49,40 +49,40 @@ public class Cuboid : IModel
         Vertex[] vertices = 
         [
             // Front face
-            new Vertex(rightTopFront, new Vector2(1f/3, 0), frontNormal),
-            new Vertex(leftTopFront, new Vector2(0, 0), frontNormal),
-            new Vertex(leftBottomFront, new Vector2(0, 1f/2), frontNormal),
-            new Vertex(rightBottomFront, new Vector2(1f/3, 1f/2), frontNormal),
+            new Vertex(rightTopFront, new Vector2(1f/3, 1f/2), frontNormal),
+            new Vertex(leftTopFront, new Vector2(0, 1f/2), frontNormal),
+            new Vertex(leftBottomFront, new Vector2(0, 0), frontNormal),
+            new Vertex(rightBottomFront, new Vector2(1f/3, 0), frontNormal),
 
             // Top face
-            new Vertex(rightTopBack, new Vector2(2f/3, 1f/2), topNormal),
-            new Vertex(leftTopBack, new Vector2(1f/3, 1f/2), topNormal),
-            new Vertex(leftTopFront, new Vector2(1f/3, 1), topNormal),
-            new Vertex(rightTopFront, new Vector2(2f/3, 1), topNormal),
+            new Vertex(rightTopBack, new Vector2(2f/3, 1), topNormal),
+            new Vertex(leftTopBack, new Vector2(1f/3, 1), topNormal),
+            new Vertex(leftTopFront, new Vector2(1f/3, 1f/2), topNormal),
+            new Vertex(rightTopFront, new Vector2(2f/3, 1f/2), topNormal),
             
             // Right face
-            new Vertex(rightTopBack, new Vector2(2f/3, 0), rightNormal),
-            new Vertex(rightTopFront, new Vector2(1f, 0), rightNormal),
-            new Vertex(rightBottomFront, new Vector2(1f, 1f/2), rightNormal),
-            new Vertex(rightBottomBack, new Vector2(2f/3, 1f/2), rightNormal),
+            new Vertex(rightTopBack, new Vector2(2f/3, 1f/2), rightNormal),
+            new Vertex(rightTopFront, new Vector2(1f, 1f/2), rightNormal),
+            new Vertex(rightBottomFront, new Vector2(1f, 0), rightNormal),
+            new Vertex(rightBottomBack, new Vector2(2f/3, 0), rightNormal),
 
             // Back face
-            new Vertex(leftTopBack, new Vector2(0, 1f/2), backNormal),
-            new Vertex(rightTopBack, new Vector2(1f/3, 1f/2), backNormal),
-            new Vertex(rightBottomBack, new Vector2(1f/3, 1), backNormal),
-            new Vertex(leftBottomBack, new Vector2(0, 1), backNormal),
+            new Vertex(leftTopBack, new Vector2(0, 1), backNormal),
+            new Vertex(rightTopBack, new Vector2(1f/3, 1), backNormal),
+            new Vertex(rightBottomBack, new Vector2(1f/3, 1f/2), backNormal),
+            new Vertex(leftBottomBack, new Vector2(0, 1f/2), backNormal),
 
             // Bottom face
-            new Vertex(leftBottomFront, new Vector2(1f/3, 0), bottomNormal),
-            new Vertex(rightBottomFront, new Vector2(2f/3, 0), bottomNormal),
-            new Vertex(rightBottomBack, new Vector2(2f/3, 1f/2), bottomNormal),
-            new Vertex(leftBottomBack, new Vector2(1f/3, 1f/2), bottomNormal),
+            new Vertex(leftBottomFront, new Vector2(1f/3, 1f/2), bottomNormal),
+            new Vertex(rightBottomFront, new Vector2(2f/3, 1f/2), bottomNormal),
+            new Vertex(rightBottomBack, new Vector2(2f/3, 0), bottomNormal),
+            new Vertex(leftBottomBack, new Vector2(1f/3, 0), bottomNormal),
 
             // Left face
-            new Vertex(leftTopFront, new Vector2(2f/3, 1f/2), leftNormal),
-            new Vertex(leftTopBack, new Vector2(1, 1f/2), leftNormal),
-            new Vertex(leftBottomBack, new Vector2(1, 1), leftNormal),
-            new Vertex(leftBottomFront, new Vector2(2f/3, 1), leftNormal)
+            new Vertex(leftTopFront, new Vector2(2f/3, 1), leftNormal),
+            new Vertex(leftTopBack, new Vector2(1, 1), leftNormal),
+            new Vertex(leftBottomBack, new Vector2(1, 1f/2), leftNormal),
+            new Vertex(leftBottomFront, new Vector2(2f/3, 1f/2), leftNormal)
         ];
         
         short[] indices =

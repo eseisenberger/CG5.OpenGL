@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using CG5.OpenGL.Interfaces;
+using CG5.Interfaces;
 using StbImageSharp;
 using GL = OpenTK.Graphics.OpenGL4.GL;
 using PixelFormat = OpenTK.Graphics.OpenGL4.PixelFormat;
@@ -13,7 +13,7 @@ using TextureParameterName = OpenTK.Graphics.OpenGL4.TextureParameterName;
 using TextureTarget = OpenTK.Graphics.OpenGL4.TextureTarget;
 using TextureWrapMode = OpenTK.Graphics.OpenGL4.TextureWrapMode;
 
-namespace CG5.OpenGL.Classes.Template;
+namespace CG5.Classes.Template;
 
 public class Texture : IDisposable, IBindable
 {

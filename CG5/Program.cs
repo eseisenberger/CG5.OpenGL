@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
-using CG5.OpenGL.Classes.Template;
-using CG5.OpenGL.Interfaces;
-using CG5.OpenGL.Objects;
+using CG5.Classes.Template;
+using CG5.Interfaces;
+using CG5.Objects;
 using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -9,7 +9,7 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace CG5.OpenGL;
+namespace CG5;
 
 public class Program(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
     : GameWindow(gameWindowSettings, nativeWindowSettings)
@@ -22,7 +22,31 @@ public class Program(GameWindowSettings gameWindowSettings, NativeWindowSettings
     private Texture Texture { get; set; } = null!;
     
     private IModel LightSource { get; set; } = null!;
-    private Vector3 LightPosition { get; set; } = new(1.2f, 1.0f, 2.0f);
+    
+    private System.Numerics.Vector3 _lightPosition = new(1.2f, 1.0f, 2.0f);
+    private Vector3 LightPosition
+    {
+        get => new(_lightPosition.X, _lightPosition.Y, _lightPosition.Z);
+        set => _lightPosition = new System.Numerics.Vector3(value.X, value.Y, value.Z);
+    }
+    private System.Numerics.Vector3 _lightColor = new(1.0f, 1.0f, 1.0f);
+    private Vector3 LightColor
+    {
+        get => new(_lightColor.X, _lightColor.Y, _lightColor.Z);
+        set => _lightColor = new System.Numerics.Vector3(value.X, value.Y, value.Z);
+    }
+    private System.Numerics.Vector3 _objectColor = new(1.0f, 0.5f, 0.31f);
+    private Vector3 ObjectColor
+    {
+        get => new(_objectColor.X, _objectColor.Y, _objectColor.Z);
+        set => _objectColor = new System.Numerics.Vector3(value.X, value.Y, value.Z);
+    }
+    private System.Numerics.Vector4 _backgroundColor = new(0.808f, 0.670f, 0.576f, 1.0f);
+    private Color4 BackgroundColor
+    {
+        get => new(_backgroundColor.X, _backgroundColor.Y, _backgroundColor.Z, _backgroundColor.W);
+        set => _backgroundColor = new System.Numerics.Vector4(value.R, value.G, value.B, value.A);
+    }
     private Shader LightShader { get; set; } = null!;
     
     private DebugProc DebugProcCallback { get; } = OnDebugMessage;
@@ -34,7 +58,7 @@ public class Program(GameWindowSettings gameWindowSettings, NativeWindowSettings
         nwSettings.NumberOfSamples = 16;
 
         using var program = new Program(gwSettings, nwSettings);
-        program.Title = "Project Title";
+        program.Title = "CG5 OpenGL";
         program.Size = new Vector2i(1280, 800);
         program.Run();
     }
@@ -67,15 +91,12 @@ public class Program(GameWindowSettings gameWindowSettings, NativeWindowSettings
             ]
         );
         
-        LightSource = new Cuboid(0.2f, 0.2f, 0.2f);
-        LightSource.ModelMatrix *= Matrix4.CreateTranslation(LightPosition);
+        LightSource = new Sphere(0.1f, 32, 32);
+        LightSource.ModelMatrix = Matrix4.Identity * Matrix4.CreateTranslation(LightPosition);
         
-        StbImageSharp.StbImage.stbi_set_flip_vertically_on_load(1);
         Texture = new Texture("texture.jpg");
-
-        //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
         
-        GL.ClearColor(0.808f, 0.670f, 0.576f, 1.0f);
+        GL.ClearColor(BackgroundColor);
         GL.Disable(EnableCap.CullFace);
         GL.Enable(EnableCap.DepthTest);
         GL.DepthFunc(DepthFunction.Lequal);
@@ -106,6 +127,7 @@ public class Program(GameWindowSettings gameWindowSettings, NativeWindowSettings
     }
 
     private float _time;
+
     protected override void OnUpdateFrame(FrameEventArgs args)
     {
         base.OnUpdateFrame(args);
@@ -115,8 +137,11 @@ public class Program(GameWindowSettings gameWindowSettings, NativeWindowSettings
         ImGuiController.Update((float)args.Time);
         Camera.Update((float)args.Time);
 
-        CurrentModel.ModelMatrix = Matrix4.CreateRotationY(_time * 0.25f);
-
+        if(_rotating)
+            CurrentModel.ModelMatrix = Matrix4.CreateRotationY(_time * 0.25f);
+        
+        LightSource.ModelMatrix = Matrix4.Identity * Matrix4.CreateTranslation(LightPosition);
+        
         if (ImGui.GetIO().WantCaptureMouse) return;
 
         var keyboard = KeyboardState.GetSnapshot();
@@ -140,11 +165,14 @@ public class Program(GameWindowSettings gameWindowSettings, NativeWindowSettings
         Shader.LoadMatrix4("model", CurrentModel.ModelMatrix);
         Shader.LoadMatrix4("view", Camera.ViewMatrix);
         Shader.LoadMatrix4("projection", Camera.ProjectionMatrix);
-        
-        //Shader.LoadFloat3("objectColor", new Vector3(1.0f, 0.5f, 0.31f));
-        Shader.LoadFloat3("lightColor", new Vector3(1.0f, 1.0f, 1.0f));
+        Shader.LoadInteger("mode", _mode);
+        Shader.LoadFloat3("objectColor", ObjectColor);
+        Shader.LoadFloat3("lightColor", LightColor);
         Shader.LoadFloat3("lightPosition", LightPosition);
         Shader.LoadFloat3("viewPosition", Camera.Position);
+        Shader.LoadFloat("ambientStrength", _ambientStrength);
+        Shader.LoadFloat("specularStrength", _specularStrength);
+        Shader.LoadInteger("specularCoefficient", _specularCoefficient);
         
         Texture.Bind();
         Shader.LoadInteger("texture1", 0);
@@ -156,6 +184,7 @@ public class Program(GameWindowSettings gameWindowSettings, NativeWindowSettings
         LightShader.LoadMatrix4("model", LightSource.ModelMatrix);
         LightShader.LoadMatrix4("view", Camera.ViewMatrix);
         LightShader.LoadMatrix4("projection", Camera.ProjectionMatrix);
+        LightShader.LoadFloat3("lightColor", LightColor);
         
         LightSource.Render();
         
@@ -168,7 +197,7 @@ public class Program(GameWindowSettings gameWindowSettings, NativeWindowSettings
 
         Context.SwapBuffers();
     }
-
+    
     protected override void OnKeyDown(KeyboardKeyEventArgs e)
     {
         base.OnKeyDown(e);
@@ -217,12 +246,153 @@ public class Program(GameWindowSettings gameWindowSettings, NativeWindowSettings
         ImGui.PushID($"{name}_c3"); ImGui.InputFloat4("", ref c3); ImGui.PopID();
         ImGui.End();
     }
-
-    private static int _control = 1;
-    private static int _projection;
+    
     private void RenderGui()
     {
+        RenderCameraControls();
+        RenderModelControls();
+        RenderModeControls();
+        RenderLightControls();
+        
+        ImGuiController.Render();
+    }
+
+    private void RenderLightControls()
+    {
+        ImGui.Begin("Light", ImGuiWindowFlags.AlwaysAutoResize);
+        
+        ImGui.SliderFloat3("Position", ref _lightPosition, -3.0f, 3.0f);
+        ImGui.SliderFloat3("Color", ref _lightColor, 0, 1);
+        
+        ImGui.End();
+    }
+    
+    private static int _mode = 2;
+    private static int _displayMode = 0;
+    private void RenderModeControls()
+    {
+        ImGui.Begin("Mode", ImGuiWindowFlags.AlwaysAutoResize);
+
+        ImGui.RadioButton("Texture", ref _mode, 0);
+        ImGui.RadioButton("Shading", ref _mode, 1);
+        ImGui.RadioButton("Both", ref _mode, 2);
+        
+        ImGui.Separator();
+        
+        if(ImGui.RadioButton("Fill", ref _displayMode, 0))
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+        if(ImGui.RadioButton("Wireframe", ref _displayMode, 1))
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+        
+        ImGui.End();
+    }
+    
+    private static int _object = 0;
+    
+    private static float _cuboidWidth = 1.0f;
+    private static float _cuboidHeight = 1.0f;
+    private static float _cuboidDepth = 1.0f;
+    private void UpdateCuboid() => CurrentModel = new Cuboid(_cuboidWidth, _cuboidHeight, _cuboidDepth);
+    
+    private static float _cylinderRadius = MathF.Sqrt(2f)/2;
+    private static float _cylinderHeight = 1.0f;
+    private static int _cylinderResolution = 32;
+    private void UpdateCylinder() => CurrentModel = new Cylinder(_cylinderRadius, _cylinderHeight, _cylinderResolution);
+    
+    private static float _sphereRadius = MathF.Sqrt(2f)/2;
+    private static int _sphereLatitudeSections = 32;
+    private static int _sphereLongitudeSections = 32;
+    private void UpdateSphere() => CurrentModel = new Sphere(_sphereRadius, _sphereLatitudeSections, _sphereLongitudeSections);
+
+    private static float _ambientStrength = 0.2f;
+    private static float _specularStrength = 0.5f;
+    private static int _specularCoefficient = 32;
+    private static bool _rotating = true;
+    private static bool _resource = true;
+    private string _texturePath = "texture.jpg";
+    private void RenderModelControls()
+    {
+        ImGui.Begin("Object", ImGuiWindowFlags.AlwaysAutoResize);
+
+        if (ImGui.RadioButton("Cuboid", ref _object, 0))
+            UpdateCuboid();
+
+        ImGui.SameLine(0, 10);
+        if (ImGui.RadioButton("Cylinder", ref _object, 1))
+            UpdateCylinder();
+        
+        ImGui.SameLine(0, 10);
+        if (ImGui.RadioButton("Sphere", ref _object, 2))
+            UpdateSphere();
+        
+        ImGui.SameLine(0, 10);
+        ImGui.Checkbox("Rotating", ref _rotating);
+        
+        ImGui.Separator();
+        if (ImGui.CollapsingHeader("Parameters"))
+        {
+            ImGui.Indent(10);
+            var update = false;
+            switch (_object)
+            {
+                case 0:
+                    //cuboid
+                    update |= ImGui.SliderFloat("Width", ref _cuboidWidth, 0.1f, 3.0f);
+                    update |= ImGui.SliderFloat("Height", ref _cuboidHeight, 0.1f, 3.0f);
+                    update |= ImGui.SliderFloat("Depth", ref _cuboidDepth, 0.1f, 3.0f);
+                    if (update)
+                        UpdateCuboid();
+                    break;
+                case 1:
+                    //cylinder
+                    update |= ImGui.SliderFloat("Radius", ref _cylinderRadius, 0.1f, 3.0f);
+                    update |= ImGui.SliderFloat("Height", ref _cylinderHeight, 0.1f, 3.0f);
+                    update |= ImGui.SliderInt("Sections", ref _cylinderResolution, 4, 256);
+                    if (update)
+                        UpdateCylinder();
+                    break;
+                case 2:
+                    //sphere
+                    update |= ImGui.SliderFloat("Radius", ref _sphereRadius, 0.1f, 3.0f);
+                    update |= ImGui.SliderInt("Latitude", ref _sphereLatitudeSections, 3, 256);
+                    update |= ImGui.SliderInt("Longitude", ref _sphereLongitudeSections, 3, 256);
+                    if (update)
+                        UpdateSphere();
+                    break;
+            }
+            ImGui.Indent(-10);
+        }
+
+        ImGui.Separator();
+        if (ImGui.CollapsingHeader("Shader parameters"))
+        {
+            ImGui.Indent(10);
+            ImGui.SliderFloat3("Object color", ref _objectColor, 0, 1);
+            ImGui.SliderFloat("Ambient strength", ref _ambientStrength, 0, 3);
+            ImGui.SliderFloat("Specular strength", ref _specularStrength, 0, 3);
+            ImGui.SliderInt("Specular coefficient", ref _specularCoefficient, 0, 256);
+            ImGui.Indent(-10);
+        }
+        ImGui.Separator();
+        ImGui.InputText("Texture path", ref _texturePath, 512);
+        ImGui.Checkbox("Resource", ref _resource);
+        ImGui.SameLine(0, 10);
+        if (ImGui.Button("Import texture..."))
+        {
+            Texture = new Texture(_texturePath, _resource);
+        }
+        ImGui.End();
+    }
+    
+    
+    
+    private static int _control = 1;
+    private static int _projection;
+    private void RenderCameraControls()
+    {
         ImGui.Begin("Camera", ImGuiWindowFlags.AlwaysAutoResize);
+        if(ImGui.SliderFloat4("Background color", ref _backgroundColor, 0, 1))
+            GL.ClearColor(BackgroundColor);
         if (ImGui.CollapsingHeader("Control"))
         {
             ImGui.Indent(10);
@@ -261,10 +431,8 @@ public class Program(GameWindowSettings gameWindowSettings, NativeWindowSettings
         }
 
         ImGui.End();
-
-        ImGuiController.Render();
     }
-
+    
     protected override void OnTextInput(TextInputEventArgs e)
     {
         base.OnTextInput(e);

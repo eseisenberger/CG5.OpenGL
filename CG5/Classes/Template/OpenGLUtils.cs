@@ -2,7 +2,7 @@ using System.Diagnostics;
 using ErrorCode = OpenTK.Graphics.OpenGL.ErrorCode;
 using GL = OpenTK.Graphics.OpenGL.GL;
 
-namespace CG5.OpenGL.Classes.Template;
+namespace CG5.Classes.Template;
 
 public static class OpenGLUtils
 {

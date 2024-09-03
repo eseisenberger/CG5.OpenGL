@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-using CG5.OpenGL.Interfaces;
+using CG5.Interfaces;
 using BufferAccess = OpenTK.Graphics.OpenGL4.BufferAccess;
 using BufferRangeTarget = OpenTK.Graphics.OpenGL4.BufferRangeTarget;
 using BufferTarget = OpenTK.Graphics.OpenGL4.BufferTarget;
@@ -8,7 +8,7 @@ using DrawElementsType = OpenTK.Graphics.OpenGL4.DrawElementsType;
 using GL = OpenTK.Graphics.OpenGL4.GL;
 using VertexAttribType = OpenTK.Graphics.OpenGL4.VertexAttribType;
 
-namespace CG5.OpenGL.Classes.Template;
+namespace CG5.Classes.Template;
 
 public abstract class Buffer : IBindable, IDisposable
 {

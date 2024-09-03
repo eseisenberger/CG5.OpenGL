@@ -1,8 +1,8 @@
-using CG5.OpenGL.Interfaces;
+using CG5.Interfaces;
 using GL = OpenTK.Graphics.OpenGL4.GL;
 using PrimitiveType = OpenTK.Graphics.OpenGL4.PrimitiveType;
 
-namespace CG5.OpenGL.Classes.Template;
+namespace CG5.Classes.Template;
 
 public class Mesh : IDisposable, IBindable
 {

@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
-using CG5.OpenGL.Classes;
-using CG5.OpenGL.Classes.Template;
-using CG5.OpenGL.Interfaces;
+using CG5.Classes;
+using CG5.Classes.Template;
+using CG5.Interfaces;
 using OpenTK.Mathematics;
 using BufferUsageHint = OpenTK.Graphics.OpenGL4.BufferUsageHint;
 using DrawElementsType = OpenTK.Graphics.OpenGL4.DrawElementsType;
@@ -9,7 +9,7 @@ using PrimitiveType = OpenTK.Graphics.OpenGL4.PrimitiveType;
 using Vector2 = OpenTK.Mathematics.Vector2;
 using Vector3 = OpenTK.Mathematics.Vector3;
 
-namespace CG5.OpenGL.Objects;
+namespace CG5.Objects;
 
 public class Cylinder : IModel
 {
@@ -18,7 +18,7 @@ public class Cylinder : IModel
     public Mesh BottomMesh { get; }
     public Mesh TopMesh { get; }
     
-    public Cylinder(float radius = 1, float height = 1, int vertexCount = 256)
+    public Cylinder(float radius = 1, float height = 1.5f, int vertexCount = 256)
     {
         TopMesh = GenerateTopMesh(radius, height, vertexCount);
         BottomMesh = GenerateBottomMesh(radius, height, vertexCount);
@@ -56,12 +56,12 @@ public class Cylinder : IModel
     {
         var topVertices = GenerateBaseVertices(
             radius: radius, 
-            height: -height / 2, 
+            height: height / 2, 
             count: vertexCount, 
             texCenter: new Vector2(0.25f, 0.75f)
         );
 
-        topVertices = topVertices.Select(x => x with { Normal = new Vector3(0,-1,0) }).ToArray();
+        topVertices = topVertices.Select(x => x with { Normal = new Vector3(0,1,0) }).ToArray();
         
         var topVertexBuffer = new VertexBuffer(topVertices, topVertices.Length * Marshal.SizeOf<Vertex>(),
             topVertices.Length, BufferUsageHint.StaticDraw,
@@ -81,12 +81,12 @@ public class Cylinder : IModel
     {
         var bottomVertices = GenerateBaseVertices(
             radius: radius, 
-            height: height / 2, 
+            height: -height / 2, 
             count: vertexCount,
             texCenter: new Vector2(0.75f, 0.75f)
         );
 
-        bottomVertices = bottomVertices.Select(x => x with { Normal = new Vector3(0,1,0) }).ToArray();
+        bottomVertices = bottomVertices.Select(x => x with { Normal = new Vector3(0,-1,0) }).ToArray();
         
         var bottomVertexBuffer = new VertexBuffer(bottomVertices, bottomVertices.Length * Marshal.SizeOf<Vertex>(),
             bottomVertices.Length, BufferUsageHint.StaticDraw,
@@ -143,7 +143,7 @@ public class Cylinder : IModel
         return indices;
     }
 
-    private static Vertex[] GenerateSideVertices(float radius, float height, int count)
+    private Vertex[] GenerateSideVertices(float radius, float height, int count)
     {
         var vertices = new Vertex[2 * count + 2];
         
@@ -155,8 +155,9 @@ public class Cylinder : IModel
             var position = Utilities.CylindricalToCartesian(currentCylindricalPosition);
             var uv = new Vector2((float)i / count, 0.5f);
 
-            vertices[i * 2] = new Vertex(position, uv, position);
-            vertices[i * 2 + 1] = new Vertex(position with { Y = height / 2 }, uv with { Y = 0.0f }, position);
+            vertices[i * 2] = new Vertex(position, uv, Vector3.Normalize(position)); // normals assume the center to be (0,0,0)
+            var upperPosition = position with { Y = height / 2 };
+            vertices[i * 2 + 1] = new Vertex(upperPosition, uv with { Y = 0.0f }, Vector3.Normalize(upperPosition));
             
             currentCylindricalPosition.Z += rotationChange;
         }

@@ -1,7 +1,7 @@
 ﻿using Vector2 = OpenTK.Mathematics.Vector2;
 using Vector3 = OpenTK.Mathematics.Vector3;
 
-namespace CG5.OpenGL.Classes;
+namespace CG5.Classes;
 
 public static class Utilities
 {

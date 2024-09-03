@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace CG5.OpenGL.Interfaces;
+namespace CG5.Interfaces;
 
 public interface IModel : IDisposable
 {
